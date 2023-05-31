@@ -32,7 +32,7 @@ import (
 var (
 	Signapk, SignapkRE = pctx.RemoteStaticRules("signapk",
 		blueprint.RuleParams{
-			Command: `rm -f $out && $reTemplate${config.JavaCmd} ${config.JavaVmFlags} -Djava.library.path=$$(dirname ${config.SignapkJniLibrary}) ` +
+			Command: `rm -f $out && $reTemplate${config.JavaCmd} -Xmx8135m ${config.JavaVmFlags} -Djava.library.path=$$(dirname ${config.SignapkJniLibrary}) ` +
 				`-jar ${config.SignapkCmd} $flags $certificates $in $out`,
 			CommandDeps: []string{"${config.SignapkCmd}", "${config.SignapkJniLibrary}"},
 		},
