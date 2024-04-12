@@ -119,10 +119,10 @@ func (lto *lto) flags(ctx BaseModuleContext, flags Flags) Flags {
 		// Apply the same for Eng builds as well.
 		if !lto.ThinLTO() || ctx.Config().Eng() {
 			ltoLdFlags = append(ltoLdFlags, "-Wl,--lto-O0")
-		}
-
-		if Bool(lto.Properties.Whole_program_vtables) {
-			ltoCFlags = append(ltoCFlags, "-fwhole-program-vtables")
+		} else {
+		    ltoCFlags = append(ltoCFlags, "-fwhole-program-vtables")
+		    ltoCFlags = append(ltoCFlags, "-O3")
+		    ltoLdFlags = append(ltoLdFlags,"-Wl,--lto-O3")
 		}
 
 		if ctx.Config().IsEnvTrue("USE_THINLTO_CACHE") {
@@ -143,6 +143,7 @@ func (lto *lto) flags(ctx BaseModuleContext, flags Flags) Flags {
 		if !ctx.Darwin() {
 			if ctx.isAfdoCompile() {
 				ltoLdFlags = append(ltoLdFlags, "-Wl,-plugin-opt,-import-instr-limit=40")
+				ltoLdFlags = append(ltoLdFlags, "-Wl,-plugin-opt=O3")
 			} else {
 				ltoLdFlags = append(ltoLdFlags, "-Wl,-plugin-opt,-import-instr-limit=5")
 			}
@@ -160,6 +161,19 @@ func (lto *lto) flags(ctx BaseModuleContext, flags Flags) Flags {
 			}
 		}
 
+		additionalLdFlags := []string{
+			"-Wl,-mllvm,-inline-threshold=600",
+			"-Wl,-mllvm,-inlinehint-threshold=550",
+			"-Wl,-mllvm,-unroll-threshold=800",
+			"-Wl,-mllvm,-polly",
+			"-Wl,-mllvm,-polly-ast-use-context",
+			"-Wl,-mllvm,-polly-invariant-load-hoisting",
+			"-Wl,-mllvm,-polly-vectorizer=stripmine",
+			"-Wl,-mllvm,-polly-loopfusion-greedy=1",
+			"-Wl,-mllvm,-polly-scheduling-chunksize=1",
+		}
+
+		flags.Local.LdFlags = append(flags.Local.LdFlags, additionalLdFlags...)
 		flags.Local.CFlags = append(flags.Local.CFlags, ltoCFlags...)
 		flags.Local.AsFlags = append(flags.Local.AsFlags, ltoCFlags...)
 		flags.Local.LdFlags = append(flags.Local.LdFlags, ltoCFlags...)
