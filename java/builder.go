@@ -46,7 +46,7 @@ var (
 				`mkdir -p "$outDir" "$annoDir" "$srcJarDir" && ` +
 				`${config.ZipSyncCmd} -d $srcJarDir -l $srcJarDir/list -f "*.java" $srcJars && ` +
 				`(if [ -s $srcJarDir/list ] || [ -s $out.rsp ] ; then ` +
-				`${config.SoongJavacWrapper} $javaTemplate${config.JavacCmd} ` +
+				`${config.SoongJavacWrapper} $javaTemplate${config.JavacCmd} -J-Xmx8135m ` +
 				`${config.JavacHeapFlags} ${config.JavacVmFlags} ${config.CommonJdkFlags} ` +
 				`$processorpath $processor $javacFlags $bootClasspath $classpath ` +
 				`-source $javaVersion -target $javaVersion ` +
@@ -108,7 +108,7 @@ var (
 				`KYTHE_VNAMES=${kytheVnames} ` +
 				`KYTHE_KZIP_ENCODING=${kytheCuEncoding} ` +
 				`KYTHE_JAVA_SOURCE_BATCH_SIZE=${kytheCuJavaSourceMax} ` +
-				`${config.SoongJavacWrapper} ${config.JavaCmd} ` +
+				`${config.SoongJavacWrapper} ${config.JavaCmd} -Xmx8135m ` +
 				// Avoid JDK9's warning about "Illegal reflective access by com.google.protobuf.Utf8$UnsafeProcessor ...
 				// to field java.nio.Buffer.address"
 				`--add-opens=java.base/java.nio=ALL-UNNAMED ` +
@@ -153,7 +153,7 @@ var (
 
 	turbine, turbineRE = pctx.RemoteStaticRules("turbine",
 		blueprint.RuleParams{
-			Command: `$reTemplate${config.JavaCmd} ${config.JavaVmFlags} -jar ${config.TurbineJar} $outputFlags ` +
+			Command: `$reTemplate${config.JavaCmd} -Xmx8135m ${config.JavaVmFlags} -jar ${config.TurbineJar} $outputFlags ` +
 				`--sources @$out.rsp  --source_jars $srcJars ` +
 				`--javacopts ${config.CommonJdkFlags} ` +
 				`$javacFlags -source $javaVersion -target $javaVersion -- $turbineFlags && ` +
@@ -228,7 +228,7 @@ var (
 				// leading to stale or missing files later in the build.  Remove the output file
 				// before running jarjar.
 				"rm -f ${out} && " +
-				"${config.JavaCmd} ${config.JavaVmFlags}" +
+				"${config.JavaCmd} -Xmx8135m ${config.JavaVmFlags}" +
 				// b/146418363 Enable Android specific jarjar transformer to drop compat annotations
 				// for newly repackaged classes. Dropping @UnsupportedAppUsage on repackaged classes
 				// avoids adding new hiddenapis after jarjar'ing.
@@ -251,7 +251,7 @@ var (
 
 	jetifier = pctx.AndroidStaticRule("jetifier",
 		blueprint.RuleParams{
-			Command:     "${config.JavaCmd}  ${config.JavaVmFlags} -jar ${config.JetifierJar} -l error -o $out -i $in -t epoch",
+			Command:     "${config.JavaCmd} -Xmx8135m ${config.JavaVmFlags} -jar ${config.JetifierJar} -l error -o $out -i $in -t epoch",
 			CommandDeps: []string{"${config.JavaCmd}", "${config.JetifierJar}"},
 		},
 	)

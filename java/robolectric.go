@@ -114,10 +114,10 @@ func (r *robolectricTest) DepsMutator(ctx android.BottomUpMutatorContext) {
 		ctx.AddVariationDependencies(nil, libTag, fmt.Sprintf(robolectricPrebuiltLibPattern, v))
 	} else {
 		if proptools.Bool(r.robolectricProperties.Upstream) {
-			ctx.AddVariationDependencies(nil, libTag, robolectricCurrentLib+"_upstream")
-		} else {
-			ctx.AddVariationDependencies(nil, libTag, robolectricCurrentLib)
-		}
+              ctx.AddVariationDependencies(nil, libTag, robolectricCurrentLib+"_upstream")
+        } else {
+              ctx.AddVariationDependencies(nil, libTag, robolectricCurrentLib)
+        }
 	}
 
 	ctx.AddVariationDependencies(nil, libTag, robolectricDefaultLibs...)
